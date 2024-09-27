@@ -1081,31 +1081,39 @@ class CPU {
                 self.loader.innerHTML = `${currentPfx} INC ${fmtAddress}`;
                 // console.log(fmtAddress);
                 // console.log(oneAndTwo);
-                alert(`Before INC value at ${fmtAddress} is ${this.cpuData.memoryArray[oneAndTwo]}`);
-                var sum = this.cpuData.memoryArray[oneAndTwo] + 1;
+                console.log(`Before INC value at ${fmtAddress} is ${this.cpuData.memoryArray[oneAndTwo]}`);
+                var originalValue = this.cpuData.memoryArray[oneAndTwo];
+                var sum = originalValue + 1;
                 // console.log("sum is:", sum);
-                alert(`After INC value at ${fmtAddress} is ${sum}`);
-                var overflow = (sum & 0x100) !== 0; // 0x100= 9 bits
+                // var overflow = (sum & 0x100) !== 0; // 0x100= 9 bits
                 this.cpuData.memoryArray[oneAndTwo] = sum & 0xFF;  // 0xFF= 8  bits
+                console.log(`After INC value at ${fmtAddress} is ${this.cpuData.memoryArray[oneAndTwo]}`);
                 // console.log("After: ",this.cpuData.memoryArray[oneAndTwo] );
                 this.cpuData.flags.zero     = (sum & 0xFF) == 0;
                //  console.log("Zero flag: ",this.cpuData.flags.zero );
                 this.cpuData.flags.negative = (sum & 0xFF) > 0x7F;
                 //console.log("Negative  flag: ",this.cpuData.flags.negative );
-                this.cpuData.flags.overflow=overflow;
+                this.cpuData.flags.overflow = (originalValue === 0x7F && this.cpuData.memoryArray[oneAndTwo] === 0x80) ||
+                                  (originalValue === 0xFF && this.cpuData.memoryArray[oneAndTwo] === 0x00);
+
                 this.cpuData.programCounter += 3;
                 // console.log("INC absolute")
                 break;
             case 0x1A: // INC (NULL)
                 // If the code were to display an address in null mode, it would be misleading, because the instruction is not actually accessing any memory location.
                 self.loader.innerHTML = `${currentPfx} INC`; // in this case increase in accumulator that's why does not display memory address(without addressing any memory location)
+                console.log(`Before INC value in Accumulator is ${this.cpuData.registers.A}`);
+                var originalValue= this.cpuData.registers.A;
                 var sum = this.cpuData.registers.A + 1;
-                var overflow = (sum & 0x100) !== 0; 
+                this.cpuData.registers.A = sum & 0xFF;
+                console.log(`After INC value in Accumulator is ${this.cpuData.registers.A}`);
                 //console.log("null sum is:", sum);
-                this.cpuData.flags.zero     = (sum == 0);
-                this.cpuData.flags.negative = (sum > 0x7F);
-                this.cpuData.flags.overflow=overflow;
-                this.cpuData.registers.A = sum;
+                this.cpuData.flags.zero     = (this.cpuData.registers.A === 0);
+                this.cpuData.flags.negative = (this.cpuData.registers.A > 0x7F);
+            
+                this.cpuData.flags.overflow = (originalValue === 0x7F && this.cpuData.registers.A === 0x80) ||
+                (originalValue === 0xFF && this.cpuData.registers.A === 0x00);
+
                 // console.log("INC: PC= ",this.cpuData.programCounter);
                 this.cpuData.programCounter += 1;
                 // console.log("INC: PC= ",this.cpuData.programCounter);
@@ -1851,58 +1859,152 @@ let cpu = new CPU()
 
 
 // put sample code program into assembly
-self.prg.value = `
-; sample program for 6502
+// self.prg.value = `
+// ; sample program for 6502
+
+// .org $FFFE
+// .word $0003
+    
+// .org $0003
+
+// start:
+//     LDX #$FF
+//     TXS
+//     SEC
+//     CLC
+//     LDA #$00
+//     STA $0040
+//     JSR clearAll
+//     ADC #$1E
+//     LDA #$04
+//     ASL A
+//     STA $0041
+//     LDA #$40
+//     STA $0050
+//     LDA $0050
+//     SBC #$20
+//     LDA #$FF
+//     CMP #$88
+
+// addLoop:
+//     LDA $0040
+//     TAX
+//     INX
+//     TXA
+//     STA $0040
+//     INC $0040
+//     BIT $0040
+//     JMP addLoop
+// clearAll:
+//     CLC
+//     CLD
+//     CLV
+//     LDA #$00
+//     LDX #$00
+//     LDY #$00
+//     RTS
+
+// .org $0040
+// .byte $00
+// `;
+
+
+self.prg.value=`
+; Sample program for 6502
 
 .org $FFFE
-.word $0003
-    
+.word $0003  ; Set reset vector to start
+
 .org $0003
 
 start:
-    LDX #$FF
-    TXS
-    SEC
-    CLC
-    LDA #$00
-    STA $0040
-    JSR clearAll
-    ADC #$1E
-    LDA #$04
-    ASL A
-    STA $0041
-    LDA #$40
-    STA $0050
-    LDA $0050
-    SBC #$20
-    LDA #$FF
-    CMP #$88
+    LDX #$FF      ; Load X with 255
+    TXS           ; Transfer X to Stack Pointer
+    SEC           ; Set carry flag
+    CLC           ; Clear carry flag
 
-addLoop:
+    ; Test Case 1: Increment in Absolute Mode
+    LDA #$05      ; Load accumulator with 5
+    STA $0040     ; Store it in memory location $0040
+    INC $0040     ; Increment value at $0040
+    ; Check if $0040 is now 6 and zero flag is false
     LDA $0040
-    TAX
-    INX
-    TXA
-    STA $0040
-    INC $0040
-    BIT $0040
-    JMP addLoop
-clearAll:
-    CLC
-    CLD
-    CLV
-    LDA #$00
-    LDX #$00
-    LDY #$00
-    RTS
+    CMP #$06      ; Should be 6
+    BEQ pass1     ; If equal, test passed
+    JMP fail      ; If not equal, test failed
+
+pass1:
+    ; Test Case 2: Increment Leading to Zero Flag
+    LDA #$FF      ; Load accumulator with 255
+    STA $2000     ; Store it in memory location $2000
+    INC $2000     ; Increment value at $2000
+    ; Check if $2000 is now 0 and zero flag is true
+    LDA $2000
+    CMP #$00      ; Should be 0
+    BEQ pass2     ; If equal, test passed
+    JMP fail      ; If not equal, test failed
+
+pass2:
+    ; Test Case 3: Increment with Overflow Condition
+    ; Log current status(only for testing perpose)
+    LDA $0040
+    ; Dummy operation
+    NOP
+    NOP
+    LDA #$7F      ; Load accumulator with 127
+    STA $3000     ; Store it in memory location $3000
+    INC $3000     ; Increment value at $3000
+    ; Check if $3000 is now 128 and carry flag is false
+    LDA $3000
+    CMP #$80      ; Should be 128
+    BEQ pass3     ; If equal, test passed
+    JMP fail      ; If not equal, test failed
+
+pass3:
+    ; Test Case 4: Increment in "Null Mode"
+    LDA #$03      ; Load accumulator with 3
+    STA $4000     ; Store it in memory location $4000
+    LDA $4000
+    ORA #$00      ; Dummy operation to maintain flags
+    INC $4000     ; Increment value at $4000
+    ; Check if $4000 is now 4 without unexpected flag changes
+    LDA $4000
+    CMP #$04      ; Should be 4
+    BEQ pass4     ; If equal, test passed
+    JMP fail      ; If not equal, test failed
+pass4:
+    ; Test Case 5: Increment Leading to Negative Flag
+    LDA #$7F      ; Load accumulator with 127
+    STA $4000     ; Store it in memory location $4000
+    INC $4000     ; Increment value at $4000
+    ; Check if $4000 is now 128 and negative flag=1
+    LDA $4000
+    CMP #$80      ; Should be 128
+    BEQ success   ; If equal, all tests passed
+    JMP fail      ; If not equal, test failed
+
+success:
+    LDA #$05      
+    STA $5004
+    BRK            ; Break to stop execution
+fail:
+    LDA #$FF      
+    STA $5000     
+    BRK           ; Break to stop execution
 
 .org $0040
-.byte $00
+.byte $00       
+
+.org $2000
+.byte $00        
+
+.org $3000
+.byte $00       
+
+.org $4000
+.byte $00        
+
 `;
-
-
-
-
 // set default CPU interval and updates speed with function call
 const defaultIntervalValue = 1000;
 self.cpuInterval.value = defaultIntervalValue;
