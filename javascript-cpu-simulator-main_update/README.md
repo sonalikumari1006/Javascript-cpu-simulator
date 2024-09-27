@@ -74,7 +74,5 @@ case 0x1A: // INC (NULL)
 ``` 
 INC $0040
 ``` 
-## Future Work: 
-#### Implement additional instructions, such as DEC, to further enhance the CPU Simulator's functionality.
 
 
