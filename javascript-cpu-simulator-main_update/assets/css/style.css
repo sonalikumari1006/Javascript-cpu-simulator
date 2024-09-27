@@ -1,0 +1,290 @@
+    /*
+        ╔══════════════════════════════════════════════════════════════════════════════════════╗
+        ║                               javascript-cpu-simulator                               ║
+        ╠══════════════════════════════════════════════════════════════════════════════════════╣
+        ║                                                                                      ║
+        ║                     assets/css/style - called by ../../index.html                    ║
+        ║                                                                                      ║
+        ║                        Copyright (c) 2019 - 2024 Mike Firoved                        ║
+        ║                  MIT License. See ../../LICENSE and ../../README.md                  ║
+        ║                                                                                      ║
+        ╚══════════════════════════════════════════════════════════════════════════════════════╝        
+    */
+    body {
+        background-image: linear-gradient(#FFFFFF, #606060);
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    table {
+        border-spacing: 10px;
+    }
+
+    #banner {
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        font-size: 18pt;
+        margin: auto;
+        text-align: center;
+        width: 800px;
+    }
+
+    #card {
+        background-image: linear-gradient(#000080, #000040);
+        border-radius: 15px;
+        border: solid 3px white;
+        height: 766px;
+        margin: auto;
+        width: 800px;
+    }
+
+    #card table tr td {
+        background-color: rgba(255, 255, 255, 0.85);
+        border: solid 1px white;
+        border-radius: 5px;
+    }
+
+    #clock {
+        font-size: 20pt;
+        height: 38px;
+        text-align: center;
+        width: 40px;
+    }
+
+    .clockInactive {
+        color: #800000;
+    }
+
+    .clockActive {
+        color: #ffff00;
+    }
+
+    #loader {
+        font-family: 'Lucida Console', monospace;
+        font-size: 11pt;
+        height: 38px;
+        padding-left: 10px;
+        width: auto;
+    }
+
+    #registers {
+        font-family: 'Lucida Console', monospace;
+        font-size: 10pt;
+        height: 40px;
+        padding-left: 10px;
+        text-align: center;
+    }
+
+    #flags {
+        font-family: 'Lucida Console', monospace;
+        font-size: 10pt;
+        height: 40px;
+        padding-left: 10px;
+        text-align: center;
+    }
+
+    #assembly {
+        font-size: 12pt;
+        font-family: 'Lucida Console', monospace;
+        height: 65px;
+        padding: 10px;
+        text-align: center;
+    }
+
+    #prg {
+        border-style: none;
+        font-size: 11pt;
+        font-family: 'Lucida Console', monospace;
+        height: 500px;
+        overflow-y: scroll;
+        width: 100%;
+    }
+
+    #memory {
+        font-family: 'Lucida Console', monospace;
+        font-size: 12pt;
+        height: 65px;
+        padding: 10px;
+        text-align: center;
+    }
+
+    #mem {
+        border-style: none;
+        font-family: 'Lucida Console', monospace;
+        font-size: 11pt;
+        height: 500px;
+        overflow-y: scroll;
+        width: 100%;
+    }
+
+    #lever {
+        height: 50px;
+        width: 380px;
+    }
+
+    #speed {
+        width: 350px;
+    }
+
+    .footer {
+        color: #F0F0F0;
+        font-family: 'Lucida Console', monospace;
+        font-size: 9pt;
+        margin: auto;
+        text-align: center;
+        width: 65%;
+    }
+
+    .footer a {
+        color: #FFFFFE;
+        font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+        font-weight: bold;
+        text-decoration: none;
+        font-size: 12pt;
+    }
+
+    .footer a img {
+        vertical-align: middle;
+    }
+
+
+    /* proto.io/freebies/onoff */
+    .onoffswitch {
+        margin: auto auto;
+        position: relative;
+        width: 150px;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+    }
+
+    .onoffswitch-checkbox {
+        display: none;
+    }
+
+    .onoffswitch-label {
+        display: block;
+        overflow: hidden;
+        cursor: pointer;
+        border: 2px solid #999999;
+        border-radius: 50px;
+    }
+
+    .onoffswitch-inner {
+        display: block;
+        width: 200%;
+        margin-left: -100%;
+        transition: margin 0.3s ease-in 0s;
+    }
+
+    .onoffswitch-inner:before,
+    .onoffswitch-inner:after {
+        display: block;
+        float: left;
+        width: 50%;
+        height: 24px;
+        padding: 0;
+        line-height: 24px;
+        font-size: 18px;
+        color: white;
+        font-family: Trebuchet, Arial, sans-serif;
+        font-weight: bold;
+        box-sizing: border-box;
+    }
+
+    .onoffswitch-inner:before {
+        content: "CPU is ON";
+        padding-left: 12px;
+        background-color: #3EC234;
+        color: #FFFFFF;
+    }
+
+    .onoffswitch-inner:after {
+        content: "CPU is OFF";
+        padding-right: 12px;
+        background-color: #E3DFDF;
+        color: #800000;
+        text-align: right;
+    }
+
+    .onoffswitch-switch {
+        display: block;
+        width: 30px;
+        margin: -3px;
+        background: #F0F0F0;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 122px;
+        border: 2px solid #999999;
+        border-radius: 50px;
+        transition: all 0.3s ease-in 0s;
+    }
+
+    .onoffswitch-checkbox:checked+.onoffswitch-label .onoffswitch-inner {
+        margin-left: 0;
+    }
+
+    .onoffswitch-checkbox:checked+.onoffswitch-label .onoffswitch-switch {
+        right: 0px;
+    }
+
+
+
+
+
+
+
+    /* Derived from https://www.w3schools.com/howto/howto_js_rangeslider.asp */
+
+    .slider {
+        -webkit-appearance: none;
+        -webkit-transition: .2s;
+        background: #9999ff;
+        border-radius: 5px;
+        height: 15px;
+        margin: auto;
+        opacity: 0.8;
+        outline: none;
+        transition: opacity .2s;
+        width: 360px;
+    }
+
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        background: #4CAF50;
+        border-radius: 50%;
+        cursor: pointer;
+        height: 25px;
+        width: 25px;
+    }
+
+    .slider::-moz-range-thumb {
+        background: #4CAF50;
+        border-radius: 50%;
+        cursor: pointer;
+        height: 25px;
+        width: 25px;
+    }
+
+    .slider:hover {
+        opacity: 1;
+    }
+
+    .slidecontainer {
+        margin: auto auto;
+        text-align: center;
+    }
+
+    .sliderLabel {
+        color: #000040;
+        display: inline-block;
+        font-family: Trebuchet, Arial, sans-serif;
+        font-size: 12px;
+        font-weight: bold;
+        position: relative;
+        text-align: center;
+        width: 100%;
+    }
